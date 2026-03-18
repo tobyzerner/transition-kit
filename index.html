@@ -1,28 +1,157 @@
 <!DOCTYPE html>
 <html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>transition-kit Demo</title>
+</head>
 <body>
 
 <style>
-  .enter-active,
-  .leave-active,
-  .move {
-    transition: all 1s;
+  :root {
+    --duration: .5s;
+    --ease: cubic-bezier(.2, .8, .2, 1);
+    --bg: #f5f6f8;
+    --panel: #ffffff;
+    --border: #d9dee7;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
   }
 
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  main {
+    width: min(760px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 40px 0 56px;
+  }
+
+  h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 24px 0 16px;
+  }
+
+  button {
+    appearance: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    background: var(--panel);
+    color: var(--text);
+    cursor: pointer;
+    font: inherit;
+    transition: border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+
+  button:hover {
+    border-color: #bfd0ff;
+    box-shadow: 0 6px 18px rgba(37, 99, 235, .08);
+    transform: translateY(-1px);
+  }
+
+  .frame {
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--panel);
+    box-shadow: 0 8px 30px rgba(15, 23, 42, .05);
+  }
+
+  #list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 220px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+  }
+
+  .item-number {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: var(--accent);
+    font-size: .85rem;
+    font-weight: 700;
+  }
+
+  .item-label {
+    font-weight: 500;
+  }
+
+  .enter-active,
   .leave-active {
-    position: absolute;
+    transition-property: opacity, transform;
+    transition-duration: var(--duration);
+    transition-timing-function: var(--ease);
+  }
+
+  .move {
+    transition-property: transform;
+    transition-duration: var(--duration);
+    transition-timing-function: var(--ease);
+  }
+
+  .resize {
+    transition-property: width, height;
+    transition-duration: var(--duration);
+    transition-timing-function: var(--ease);
   }
 
   .enter-from,
   .leave-to {
     opacity: 0;
-    transform: translateX(-30px);
+    transform: translateX(-100px);
+  }
+
+  @media (max-width: 560px) {
+    main {
+      width: min(100vw - 20px, 760px);
+      padding-top: 24px;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
+    * {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
@@ -31,45 +160,72 @@
   }
 </style>
 
-<button onclick="add()">Add</button>
-<button onclick="remove()">Remove</button>
-<button onclick="shuffle()">Shuffle</button>
+<main>
+  <h1>Transition Kit</h1>
+  <p>Small DOM transition primitives for explicit enter, leave, move, and resize animations.</p>
 
-<ul id="list"></ul>
+  <div class="controls">
+    <button type="button" onclick="add()">Add</button>
+    <button type="button" onclick="remove()">Remove</button>
+    <button type="button" onclick="shuffle()">Shuffle</button>
+  </div>
+
+  <div class="frame">
+    <ul id="list"></ul>
+  </div>
+</main>
 
 <script type="module">
-  import { hello, goodbye, move } from 'https://unpkg.com/hello-goodbye?module'; // './src/index.ts';
+  const modulePath = import.meta.env?.DEV
+    ? './src/index.ts'
+    : './dist/transition-kit.js';
+  const { enter, leave, move, resize } = await import(modulePath);
 
   const list = document.getElementById('list');
   let index = 1;
 
   function createItem() {
     const li = document.createElement('li');
-    li.textContent = 'Item ' + index++;
+    li.className = 'item';
+    li.innerHTML = `
+      <span class="item-number">${index}</span>
+      <span class="item-label">Item ${index++}</span>
+    `;
     return li;
   }
 
   window.add = () => {
     const li = createItem();
-    move(list.children, () => {
-      if (list.children.length) {
-        const child = list.children[Math.floor(Math.random() * list.children.length)];
-        list.insertBefore(li, child);
-      } else {
-        list.appendChild(li);
-      }
-      hello(li);
+    resize(list, () => {
+      move(list.children, () => {
+        if (list.children.length) {
+          const child = list.children[Math.floor(Math.random() * list.children.length)];
+          list.insertBefore(li, child);
+        } else {
+          list.appendChild(li);
+        }
+        enter(li).then((complete) => console.log('enter', complete));
+      });
     });
-  }
+  };
 
   window.remove = () => {
-    const children = list.querySelectorAll('*:not(.leave-active)');
-    if (! children.length) return;
+    const children = Array.from(list.children).filter(
+      (el) => !el.classList.contains('leave-active') && !el.classList.contains('enter-active')
+    );
+    if (!children.length) return;
+
     const child = children[Math.floor(Math.random() * children.length)];
-    move(Array.from(children).filter(el => el !== child), () => {
-      goodbye(child).then(() => list.removeChild(child));
+    resize(list, () => {
+      move(children.filter((el) => el !== child), () => {
+        void leave(child).then((completed) => {
+          if (completed) {
+            child.remove();
+          }
+        });
+      });
     });
-  }
+  };
 
   window.shuffle = () => {
     move(list.children, () => {
@@ -77,7 +233,7 @@
         list.appendChild(list.children[Math.random() * i | 0]);
       }
     });
-  }
+  };
 </script>
 
 </body>

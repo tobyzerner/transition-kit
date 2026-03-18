@@ -1,28 +1,44 @@
 {
-    "name": "hello-goodbye",
+    "name": "transition-kit",
     "version": "0.2.2",
-    "description": "Tiny library to apply enter, leave, and move transitions to DOM elements.",
-    "module": "dist/hello-goodbye.js",
+    "description": "Tiny DOM transition primitives for explicit enter, leave, move, and resize transitions.",
     "type": "module",
-    "types": "dist/types/index.d.ts",
+    "main": "./dist/transition-kit.js",
+    "module": "./dist/transition-kit.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/types/index.d.ts",
+            "import": "./dist/transition-kit.js",
+            "default": "./dist/transition-kit.js"
+        }
+    },
     "license": "MIT",
-    "repository": "tobyzerner/hello-goodbye",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tobyzerner/transition-kit.git"
+    },
+    "homepage": "https://github.com/tobyzerner/transition-kit#readme",
+    "bugs": {
+        "url": "https://github.com/tobyzerner/transition-kit/issues"
+    },
     "files": [
         "dist"
     ],
     "sideEffects": false,
     "scripts": {
         "dev": "vite",
-        "build": "tsc --noEmit && vite build && tsc --emitDeclarationOnly",
+        "build": "vite build && tsc --emitDeclarationOnly",
+        "prepare": "pnpm build",
         "preview": "vite preview",
         "release": "release-it"
     },
     "devDependencies": {
-        "@release-it/conventional-changelog": "^5.1.1",
-        "prettier": "^2.8.4",
-        "release-it": "^15.9.0",
-        "typescript": "^5.0.2",
-        "vite": "^4.2.0"
+        "@release-it/conventional-changelog": "^10.0.6",
+        "prettier": "^3.8.1",
+        "release-it": "^19.2.4",
+        "typescript": "^5.9.3",
+        "vite": "^8.0.0"
     },
     "release-it": {
         "git": {
@@ -41,10 +57,11 @@
             }
         },
         "hooks": {
-            "after:bump": "npm run build"
+            "after:bump": "pnpm build"
         }
     },
     "prettier": {
         "singleQuote": true
-    }
+    },
+    "packageManager": "pnpm@10.32.1"
 }
