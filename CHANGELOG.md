@@ -2,8 +2,6 @@
 
 ## [1.0.0](https://github.com/tobyzerner/hello-goodbye/compare/v0.2.2...v1.0.0) (2026-03-23)
 
-## Unreleased
-
 ### ⚠ BREAKING CHANGES
 
 * The package is now published as `transition-kit`. Update installs and imports from `hello-goodbye` to `transition-kit`.
