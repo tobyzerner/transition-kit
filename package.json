@@ -1,6 +1,6 @@
 {
     "name": "transition-kit",
-    "version": "0.2.2",
+    "version": "1.0.0",
     "description": "Tiny DOM transition primitives for explicit enter, leave, move, and resize transitions.",
     "type": "module",
     "main": "./dist/transition-kit.js",
