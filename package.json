@@ -55,9 +55,6 @@
                 "infile": "CHANGELOG.md",
                 "header": "# Changelog"
             }
-        },
-        "hooks": {
-            "after:bump": "pnpm build"
         }
     },
     "prettier": {
